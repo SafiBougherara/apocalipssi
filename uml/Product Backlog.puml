@@ -1,0 +1,46 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam usecase {
+  BackgroundColor<<must>> #D4EDDA
+  BorderColor<<must>> #28A745
+  BackgroundColor<<should>> #D1ECF1
+  BorderColor<<should>> #17A2B8
+  BackgroundColor<<could>> #FFF3CD
+  BorderColor<<could>> #FFC107
+  BackgroundColor<<wont>> #F8D7DA
+  BorderColor<<wont>> #DC3545
+}
+
+title Product Backlog — EduTutor IA (MoSCoW)
+
+package "MUST HAVE — Release 1" {
+  usecase "US1 · S inscrire par email\nDoD: compte actif, email confirme" <<must>>
+  usecase "US2 · Valider son compte\nDoD: token verifie, redirect login" <<must>>
+  usecase "US3 · Reset mot de passe\nDoD: lien email, nouveau mdp actif" <<must>>
+  usecase "US4 · Uploader un PDF <= 5Mo\nDoD: texte extrait, erreur si KO" <<must>>
+  usecase "US5 · Saisir texte >= 200c\nDoD: validation longueur front+back" <<must>>
+  usecase "US6 · Generer 10 QCM IA\nDoD: 10 questions JSON valides RAG" <<must>>
+  usecase "US7 · Repondre au quiz\nDoD: soumission, score calcule /10" <<must>>
+  usecase "US8 · Voir score + corrections\nDoD: bonne reponse affichee / Q" <<must>>
+  usecase "US9 · Consulter historique\nDoD: liste triee date, cours, score" <<must>>
+  usecase "US10 · Pages legales RGPD\nDoD: CGU + politique + mentions OK" <<must>>
+}
+
+package "SHOULD HAVE — Release 1 si temps" {
+  usecase "US11 · Interface enseignante\nDoD: profil teacher, quiz exportable" <<should>>
+}
+
+package "COULD HAVE — Release 2" {
+  usecase "US12 · Export donnees SAR\nDoD: GET /api/me/export JSON/CSV" <<could>>
+  usecase "US13 · Audit qualite quiz\nDoD: rapport 50 Q, taux erreur < 10%" <<could>>
+  usecase "US14 · Filtres historique\nDoD: filtre date/score fonctionnel" <<could>>
+}
+
+package "WON'T HAVE — Hors scope" {
+  usecase "Application mobile iOS/Android" <<wont>>
+  usecase "Integration Moodle / LMS" <<wont>>
+  usecase "Collaboration multi-profs temps reel" <<wont>>
+}
+
+@enduml

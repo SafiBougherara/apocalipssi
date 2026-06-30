@@ -1,0 +1,56 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Modele de classes — EduTutor IA
+
+class User {
+  +id : UUID
+  +email : String
+  +password_hash : String
+  +is_verified : Boolean
+  +date_joined : DateTime
+  +role : Enum[student, teacher, admin]
+}
+
+class Cours {
+  +id : UUID
+  +title : String
+  +source_type : Enum[pdf, text]
+  +source_text : TextField
+  +file_path : String
+  +created_at : DateTime
+}
+
+class Quiz {
+  +id : UUID
+  +score : Integer
+  +completed_at : DateTime
+  +created_at : DateTime
+}
+
+class Question {
+  +id : UUID
+  +enonce : TextField
+  +choice_a : String
+  +choice_b : String
+  +choice_c : String
+  +choice_d : String
+  +correct_answer : Enum[A,B,C,D]
+  +order : Integer
+}
+
+class UserAnswer {
+  +id : UUID
+  +answer_given : Enum[A,B,C,D]
+  +is_correct : Boolean
+  +answered_at : DateTime
+}
+
+User "1" --> "0..*" Cours : cree
+User "1" --> "0..*" Quiz : passe
+Cours "1" --> "0..*" Quiz : genere
+Quiz "1" --> "10" Question : contient
+Question "1" --> "0..1" UserAnswer : recoit
+User "1" --> "0..*" UserAnswer : soumet
+
+@enduml

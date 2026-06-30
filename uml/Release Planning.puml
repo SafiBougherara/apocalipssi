@@ -1,0 +1,35 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam rectangle {
+  BackgroundColor<<r1>> #D4EDDA
+  BorderColor<<r1>> #28A745
+  BackgroundColor<<r2>> #FFF3CD
+  BorderColor<<r2>> #FFC107
+  BackgroundColor<<title>> #1A56AA
+  FontColor<<title>> white
+  BorderColor<<title>> #1A56AA
+}
+
+title Release Planning — EduTutor IA
+
+rectangle "RELEASE 1 — MVP\nMercredi 01/07 · 17h45 STRICT" <<title>>
+
+rectangle "F1 · Auth email\n(inscription, validation, reset)" <<r1>> as F1
+rectangle "F2 · Upload cours\n(PDF <= 5Mo ou texte >= 200c)" <<r1>> as F2
+rectangle "F3 · Generation quiz\n(10 QCM via Ollama RAG)" <<r1>> as F3
+rectangle "F4 · Soumission quiz\n(correction auto)" <<r1>> as F4
+rectangle "F5 · Score + detail\n(/10 + bonnes/mauvaises)" <<r1>> as F5
+rectangle "F6 · Historique\n(date + cours + score)" <<r1>> as F6
+rectangle "Pages legales\n(CGU, RGPD, Mentions)" <<r1>> as LEGAL
+rectangle "Securite base\n(JWT, validation inputs)" <<r1>> as SEC1
+
+rectangle "RELEASE 2\nJeudi 02/07 · 17h45 STRICT" <<title>>
+
+rectangle "Export SAR RGPD\n(endpoint /api/me/export)" <<r2>> as SAR
+rectangle "Patch LLM-01\n(5 tests + 4 couches)" <<r2>> as PATCH
+rectangle "Audit qualite quiz\n(50 questions + postmortem)" <<r2>> as AUDIT
+rectangle "UX Mme Lefevre\n(interface enseignant)" <<r2>> as UX2
+rectangle "Filtres historique\n(date, cours, score)" <<r2>> as HIST2
+
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam card {
+  BackgroundColor #F8F9FA
+  BorderColor #6C757D
+}
+
+title Sprint Backlog S1 — EduTutor IA (29/06 -> 01/07)
+
+package "Infrastructure & Setup" {
+  card "Setup repo GitHub\n+ structure /docs\n1h | Lead Dev"
+  card "Docker Compose :\nDjango + PostgreSQL + Ollama\n2h | DevOps"
+}
+
+package "Backend — Django DRF" {
+  card "Modeles DB :\nUser, Cours, Quiz,\nQuestion, UserAnswer\n2h | Backend"
+  card "API Auth :\nregister/login/reset/verify\n3h | Backend"
+  card "API Upload :\nPDF + texte + validation\n2h | Backend"
+  card "Service RAG + prompt\nOllama -> 10 QCM JSON\n4h | IA Dev"
+  card "API Quiz :\nsoumission + scoring auto\n2h | Backend"
+  card "API Historique :\nGET /api/quizzes/\n1h | Backend"
+}
+
+package "Frontend — React + Vite" {
+  card "Pages Auth :\nlogin, register, reset, verify\n3h | Frontend"
+  card "Page Upload + spinner\ngeneration quiz\n3h | Frontend"
+  card "Page Quiz interactif\n+ resultats + score\n3h | Frontend"
+  card "Page Historique :\nliste + detail\n2h | Frontend"
+}
+
+package "RGPD & Qualite" {
+  card "Redaction pages legales\nCGU + RGPD + Mentions\n1h | Tous"
+  card "Commit artefacts\n/docs/cadrage/ + tag v0.1\n30min | Lead Dev"
+}
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Sequence — Generation d un Quiz (F2 + F3)
+
+actor Etudiant
+participant "React Frontend" as FRONT
+participant "Django API\n/api/quiz/generate" as API
+participant "RAG Service\nextract_text()" as RAG
+participant "Ollama\n:11434" as OLLAMA
+database "PostgreSQL" as DB
+
+Etudiant -> FRONT : Upload PDF ou texte
+FRONT -> FRONT : Validation client\n(taille <= 5Mo, texte >= 200c)
+FRONT -> API : POST /api/quiz/generate\n{file | text, type}
+API -> API : Verif JWT token\nVerif contraintes
+API -> RAG : extract_text(source)
+RAG -> RAG : PyPDF2 / text parse\nchunking + nettoyage
+RAG -> OLLAMA : POST /api/generate\n{model: llama3.1:8b,\nprompt: system + doc}
+OLLAMA --> RAG : stream JSON response\n10 questions QCM
+RAG -> RAG : Parse JSON\nValidation Pydantic\n(schema strict)
+RAG --> API : questions[] validees
+API -> DB : INSERT Quiz\nINSERT 10 Questions
+API --> FRONT : 201 Created\n{quiz_id, questions[]}
+FRONT -> Etudiant : Affiche quiz interactif\n(10 QCM cliquables)
+
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Deploiement Docker Compose — EduTutor IA
+
+node "Serveur Linux (VPS ou local)" as SERVER {
+  node "Docker Engine" {
+
+    node "frontend\nnode:alpine | port 3000" as FNODE {
+      artifact "React build dist/"
+    }
+
+    node "backend\npython:3.11 | port 8000" as BNODE {
+      artifact "Django + Gunicorn"
+      artifact ".env (secrets)"
+    }
+
+    node "db\npostgres:15 | port 5432" as DBNODE {
+      database "Volume pgdata (persistant)"
+    }
+
+    node "ollama\nollama/ollama | port 11434" as OLNODE {
+      artifact "Volume ollama_models\nllama3.1:8b (~4.5 Go)"
+    }
+
+    node "nginx\nnginx:alpine | port 80/443" as NGNODE {
+      artifact "nginx.conf (reverse proxy)"
+    }
+  }
+}
+
+NGNODE --> FNODE : proxy /
+NGNODE --> BNODE : proxy /api/*
+BNODE --> DBNODE : TCP 5432
+BNODE --> OLNODE : HTTP 11434
+
+note right of OLNODE
+  GPU CUDA : optionnel
+  CPU fallback : supporte
+  Donnees : jamais externalisees
+  OLLAMA_MODEL=llama3.1:8b
+end note
+
+@enduml

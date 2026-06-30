@@ -1,0 +1,46 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+title Architecture technique — EduTutor IA
+
+package "Client Browser" {
+  [React + Vite\n:3000] as FRONT
+}
+
+package "Docker Compose — Serveur" {
+
+  package "Backend" {
+    [Django REST Framework\n:8000 (Gunicorn)] as API
+    [PostgreSQL 15\n:5432] as DB
+  }
+
+  package "IA Layer" {
+    [Ollama\nLlama 3.1 8B\n:11434] as OLLAMA
+    [RAG Service\n(PyPDF2 + chunking\n+ prompt builder)] as RAG
+  }
+
+  [Nginx (reverse proxy)\n:80 / :443] as NGINX
+}
+
+FRONT --> NGINX : HTTPS
+NGINX --> FRONT : / (static build)
+NGINX --> API : /api/*
+API --> DB : ORM Django (TCP 5432)
+API --> RAG : texte source extrait
+RAG --> OLLAMA : POST /api/generate\n{model, prompt}
+OLLAMA --> RAG : stream JSON\n10 QCM
+RAG --> API : questions[] validees (Pydantic)
+
+note right of OLLAMA
+  Modele local uniquement
+  Aucune donnee externalisee
+  Conformite RGPD garantie
+end note
+
+note bottom of DB
+  Volume Docker persistant
+  Backup quotidien recommande
+end note
+
+@enduml

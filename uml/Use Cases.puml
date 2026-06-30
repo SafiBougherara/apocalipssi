@@ -1,0 +1,46 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Use Cases — EduTutor IA MVP
+left to right direction
+
+actor "Etudiant" as STU
+actor "Mme Lefevre\n(Enseignante)" as TEACH
+actor "Admin" as ADMIN
+actor "Ollama LLM\n(local)" as AI <<system>>
+
+rectangle "EduTutor IA" {
+  usecase "S inscrire / Se connecter [F1]" as UC1
+  usecase "Valider email [F1]" as UC2
+  usecase "Reset mot de passe [F1]" as UC3
+  usecase "Uploader un cours PDF/texte [F2]" as UC4
+  usecase "Generer quiz IA 10 QCM [F3]" as UC5
+  usecase "Repondre au quiz [F4]" as UC6
+  usecase "Voir score + corrections [F5]" as UC7
+  usecase "Consulter historique [F6]" as UC8
+  usecase "Exporter ses donnees SAR RGPD" as UC9
+  usecase "Gerer utilisateurs back-office" as UC10
+  usecase "Configurer modele IA back-office" as UC11
+}
+
+STU --> UC1
+STU --> UC2
+STU --> UC3
+STU --> UC4
+STU --> UC5
+STU --> UC6
+STU --> UC7
+STU --> UC8
+STU --> UC9
+
+TEACH --> UC1
+TEACH --> UC4
+TEACH --> UC5
+TEACH --> UC9
+
+ADMIN --> UC10
+ADMIN --> UC11
+
+UC5 ..> AI : <<include>>\nappel Ollama API
+
+@enduml
