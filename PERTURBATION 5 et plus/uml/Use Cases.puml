@@ -1,0 +1,105 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Use Cases — EduTutor IA v2.0 (Release 3 · Scale · RGAA · i18n)
+left to right direction
+
+actor "Etudiant\n(Lucas)" as STU
+actor "Lucia\n(Malvoyante / Int.)" as LUCIA
+actor "Mme Lefevre\n(Enseignante)" as TEACH
+actor "Admin / DSI" as ADMIN
+actor "Ollama LLM\n(local)" as AI <<system>>
+actor "Redis Cache" as REDIS <<system>>
+actor "Prometheus\n(monitoring)" as PROM <<system>>
+
+rectangle "EduTutor IA — R3" {
+
+  package "F1 — Authentification" {
+    usecase "S inscrire / Se connecter" as UC1
+    usecase "Valider email" as UC2
+    usecase "Reset mot de passe" as UC3
+  }
+
+  package "F2-F3 — Cours & Génération" {
+    usecase "Uploader un cours PDF/texte" as UC4
+    usecase "Generer quiz IA 10 QCM" as UC5
+    usecase "Recevoir quiz dans sa langue [i18n]" as UC5b
+  }
+
+  package "F4-F5-F6 — Quiz & Résultats" {
+    usecase "Repondre au quiz" as UC6
+    usecase "Voir score + corrections" as UC7
+    usecase "Consulter historique" as UC8
+  }
+
+  package "RGPD" {
+    usecase "Exporter ses donnees SAR RGPD" as UC9
+  }
+
+  package "[a11y] RGAA — Release 3" {
+    usecase "Naviguer entierement au clavier\n(Tab · Entree · Echap)" as UC12
+    usecase "Utiliser un lecteur d ecran\n(VoiceOver / JAWS — labels ARIA)" as UC13
+    usecase "Affichage haut contraste\n(ratio >= 4.5:1 RGAA 3.2)" as UC14
+  }
+
+  package "[i18n] Internationalisation — Release 3" {
+    usecase "Choisir la langue de l interface\n(fr / en / es)" as UC15
+    usecase "Recevoir le quiz dans la langue choisie\n(param lang -> LLM)" as UC16
+    usecase "Detection auto langue navigateur" as UC17
+  }
+
+  package "Admin & DSI — Back-office" {
+    usecase "Gerer utilisateurs back-office" as UC10
+    usecase "Configurer modele IA (LLM)" as UC11
+    usecase "Consulter monitoring disponibilite\n(Prometheus / Grafana)" as UC18
+    usecase "Lancer tests de charge (k6)" as UC19
+    usecase "Configurer cache Redis (TTL)" as UC20
+  }
+}
+
+' Etudiant
+STU --> UC1
+STU --> UC2
+STU --> UC3
+STU --> UC4
+STU --> UC5
+STU --> UC6
+STU --> UC7
+STU --> UC8
+STU --> UC9
+STU --> UC15
+
+' Lucia (malvoyante / internationale)
+LUCIA --> UC1
+LUCIA --> UC4
+LUCIA --> UC5
+LUCIA --> UC6
+LUCIA --> UC7
+LUCIA --> UC12
+LUCIA --> UC13
+LUCIA --> UC14
+LUCIA --> UC15
+LUCIA --> UC16
+LUCIA --> UC17
+
+' Enseignante
+TEACH --> UC1
+TEACH --> UC4
+TEACH --> UC5
+TEACH --> UC9
+
+' Admin
+ADMIN --> UC10
+ADMIN --> UC11
+ADMIN --> UC18
+ADMIN --> UC19
+ADMIN --> UC20
+
+' Systemes
+UC5 ..> AI : <<include>>\nappel Ollama /api/chat
+UC5 ..> REDIS : <<include>>\ncheck cache (TTL 24h)
+UC5b ..> UC5 : <<extend>>\nlang param injecte
+UC16 ..> UC5 : <<include>>\nparam lang -> system prompt
+UC18 ..> PROM : <<include>>\nmetriques HTTP
+
+@enduml

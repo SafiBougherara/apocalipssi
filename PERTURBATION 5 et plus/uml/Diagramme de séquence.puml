@@ -1,0 +1,57 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Sequence — Generation d un Quiz i18n + Cache Redis (R3)
+
+actor "Lucia\n(lang=es)" as LUCIA
+participant "React Frontend\n(i18next)" as FRONT
+participant "Django API\n/api/quiz/generate" as API
+participant "Redis\n:6379" as REDIS
+participant "RAG Service\n+ sanitize" as RAG
+participant "Ollama :11434\n(llama3.2)" as OLLAMA
+participant "LLM Fallback\n(OpenAI / Claude)" as FALLBACK
+database "PostgreSQL" as DB
+
+LUCIA -> FRONT : Selectionne langue = "es"\n(i18next detecte lang navigateur)
+FRONT -> FRONT : UI basculee en espagnol\n(traductions es.json chargees)
+
+LUCIA -> FRONT : Upload PDF + soumet
+FRONT -> FRONT : Validation client\n(taille <= 5Mo)
+FRONT -> API : POST /api/quiz/generate\n{file | text, type, lang: "es"}
+
+API -> API : Verif JWT token\nVerif contraintes (size, length)
+API -> API : sanitize_source_text()\n(strip HTML, unicode invisibles,\ninjections LLM-01)
+
+API -> REDIS : GET cache_key\n= hash(source_text + "es")
+
+alt Cache HIT
+  REDIS --> API : 200 · questions[] en cache
+  API -> DB : INSERT Quiz (from_cache=True)
+  API --> FRONT : 201 Created · {quiz_id, questions[]}\n(< 100ms)
+else Cache MISS
+  REDIS --> API : null
+
+  API -> RAG : extract_text(source) + lang="es"
+  RAG -> RAG : PyPDF2 / text parse\nchunking + nettoyage
+
+  RAG -> OLLAMA : POST /api/chat\n{model: llama3.2,\nmessages: [\n  {role:system, content: "...Genera el quiz en espanol..."},\n  {role:user, content: "<COURS>...</COURS>"}\n]}
+
+  alt Ollama disponible
+    OLLAMA --> RAG : stream JSON response\n10 questions QCM en espagnol
+  else Timeout / erreur Ollama
+    RAG -> FALLBACK : meme prompt (fallback)
+    FALLBACK --> RAG : 10 QCM JSON (fallback)
+    RAG -> RAG : log WARNING "LLM fallback active"
+  end
+
+  RAG -> RAG : Parse JSON\nValidation Pydantic (schema strict)\nVerif distribution correct_answer\n(anti-injection couche 4)
+  RAG --> API : questions[] validees (lang="es")
+
+  API -> REDIS : SET cache_key = questions[]\nTTL = 86400s (24h)
+  API -> DB : INSERT Quiz + 10 Questions (lang="es")
+  API --> FRONT : 201 Created · {quiz_id, questions[]}
+end
+
+FRONT -> LUCIA : Affiche quiz interactif en espagnol\n(10 QCM · navigation clavier active\nfocus visible · labels ARIA)
+
+@enduml

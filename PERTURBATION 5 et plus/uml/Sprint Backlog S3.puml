@@ -1,0 +1,49 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam CardBackgroundColor #F8F9FA
+skinparam CardBorderColor #6C757D
+skinparam CardBackgroundColor<<a11y>> #F3E5F5
+skinparam CardBorderColor<<a11y>> #8E24AA
+skinparam CardBackgroundColor<<i18n>> #E3F2FD
+skinparam CardBorderColor<<i18n>> #1565C0
+skinparam CardBackgroundColor<<scale>> #FFF8E1
+skinparam CardBorderColor<<scale>> #F57F17
+
+title Sprint Backlog S3 — EduTutor IA (Release 3 · 07/07 -> 11/07)
+
+legend top left
+  Sprint Goal : Poser les fondations R3
+  RGAA audit lance · i18next integre
+  Redis cache actif · tests de charge planifies
+  Velocite cible : 30 pts
+end legend
+
+package "[a11y] Accessibilite RGAA — 11 pts" {
+  card "T-16 · Audit RGAA initial\nParcourir interface · lister criteres bloquants\nUS-25 · Dev Front · 5 pts" <<a11y>>
+  card "T-17 · Corriger contrastes\nRatio >= 4.5:1 sur tous les composants\nUS-26 · Dev Front · 3 pts" <<a11y>>
+  card "T-18 · Navigation clavier\nTab order + focus outline + Echap modales\nUS-27 · Dev Front · 3 pts" <<a11y>>
+}
+
+package "[i18n] Internationalisation — 10 pts" {
+  card "T-19 · Integrer i18next\nExtraire tous les textes UI en fichiers fr/en\nUS-28 · Dev Front · 5 pts" <<i18n>>
+  card "T-20 · Traductions espagnol\nCompleter es.json · validation locuteur natif\nUS-28 · Dev Front · 3 pts" <<i18n>>
+  card "T-21 · Parametre langue -> LLM\nAjouter param lang dans system prompt Ollama\nUS-29 · Dev Back · 2 pts" <<i18n>>
+}
+
+package "[scale] Scalabilite — 8 pts" {
+  card "T-22 · Scenario k6 de base\nSimulation 1 000 utilisateurs simultanes\nUS-30 · Dev Back · 3 pts" <<scale>>
+  card "T-23 · Redis dans docker-compose\nIntegrer Redis + configurer cache LLM (TTL 24h)\nUS-31 · Dev Back · 5 pts" <<scale>>
+}
+
+package "Burndown S3 — 29 pts sur 30" {
+  card "Debut S3 : 29 pts\nJ+1 : 23 pts\nJ+2 : 17 pts\nJ+3 : 11 pts\nJ+4 :  5 pts\nJ+5 :  0 pts"
+}
+
+package "Impediments" {
+  card "I-01 : Outil audit RGAA a choisir\n(axe-core / Lighthouse / RGAA Check)\n-> Decision J4 matin"
+  card "I-02 : Licence k6 Cloud\npour tests > 100 VU\n-> k6 open-source + instance dedies"
+  card "I-03 : Traductions es.json\na valider par locuteur natif\n-> Iteration R3 avec revue externe"
+}
+
+@enduml

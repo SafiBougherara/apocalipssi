@@ -1,0 +1,78 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Deploiement Docker Compose v2 — EduTutor IA (Scale · Monitoring)
+
+node "Serveur Linux (VPS ou Kubernetes node)" as SERVER {
+  node "Docker Engine / Compose" {
+
+    node "frontend\nnode:alpine | port 3000" as FNODE {
+      artifact "React build dist/"
+      artifact "i18next locales\n(fr.json, en.json, es.json)"
+    }
+
+    node "backend\npython:3.11 | port 8000" as BNODE {
+      artifact "Django + Gunicorn"
+      artifact "RAG Service (4 couches anti-injection)"
+      artifact ".env (secrets)"
+    }
+
+    node "db\npostgres:15 | port 5432" as DBNODE {
+      database "Volume pgdata (persistant)"
+    }
+
+    node "redis\nredis:7-alpine | port 6379" as RNODE {
+      artifact "Cache LLM (TTL=86400s)"
+      artifact "Volume redis_data"
+    }
+
+    node "ollama\nollama/ollama | port 11434" as OLNODE {
+      artifact "Volume ollama_models\nllama3.2 (~2Go) · llama3.1:8b (~4.5Go)"
+    }
+
+    node "nginx\nnginx:alpine | port 80/443" as NGNODE {
+      artifact "nginx.conf\n(reverse proxy + rate limit)"
+    }
+
+    node "prometheus\nprom/prometheus | port 9090" as PROMNODE {
+      artifact "prometheus.yml (scrape config)"
+    }
+
+    node "grafana\ngrafana/grafana | port 3001" as GRAFNODE {
+      artifact "Dashboards (latence LLM,\nhits cache, erreurs HTTP)"
+    }
+  }
+}
+
+NGNODE --> FNODE : proxy /
+NGNODE --> BNODE : proxy /api/*
+BNODE --> DBNODE : TCP 5432
+BNODE --> RNODE : TCP 6379 (cache_get / cache_set)
+BNODE --> OLNODE : HTTP 11434 (/api/chat)
+GRAFNODE --> PROMNODE : scrape /metrics
+PROMNODE --> BNODE : scrape /metrics (django-prometheus)
+
+note right of OLNODE
+  GPU CUDA : optionnel
+  CPU fallback : supporte
+  OLLAMA_MODEL=llama3.2
+  Fallback cloud via env:
+  LLM_FALLBACK_PROVIDER=openai
+end note
+
+note right of RNODE
+  CACHE_LLM=true (env)
+  TTL configurable par env
+  Cle = hash(source_text+lang)
+  Donnees : jamais externalisees
+end note
+
+note bottom of PROMNODE
+  Metriques collectees :
+  - http_request_duration_ms
+  - llm_generation_latency_ms
+  - cache_hit_rate
+  - llm_fallback_count
+end note
+
+@enduml

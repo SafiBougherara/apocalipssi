@@ -1,0 +1,64 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam usecase {
+  BackgroundColor<<must>> #D4EDDA
+  BorderColor<<must>> #28A745
+  BackgroundColor<<should>> #D1ECF1
+  BorderColor<<should>> #17A2B8
+  BackgroundColor<<could>> #FFF3CD
+  BorderColor<<could>> #FFC107
+  BackgroundColor<<wont>> #F8D7DA
+  BorderColor<<wont>> #DC3545
+}
+
+title Product Backlog — EduTutor IA v2.0 (MoSCoW — R1 · R2 · R3)
+
+package "MUST HAVE — Release 1 (MVP livré v1.0.0)" {
+  usecase "US01 · S inscrire par email\nDoD: compte actif, email confirme" <<must>>
+  usecase "US02 · Valider son compte\nDoD: token verifie, redirect login" <<must>>
+  usecase "US03 · Reset mot de passe\nDoD: lien email, nouveau mdp actif" <<must>>
+  usecase "US04 · Upload PDF <= 5Mo\nDoD: texte extrait, erreur si KO" <<must>>
+  usecase "US05 · Saisir texte >= 200c\nDoD: validation longueur front+back" <<must>>
+  usecase "US06 · Generer 10 QCM llama3.2\nDoD: 10 questions JSON valides RAG" <<must>>
+  usecase "US07 · Repondre au quiz\nDoD: soumission, score calcule /10" <<must>>
+  usecase "US08 · Voir score + corrections\nDoD: bonne reponse affichee / Q" <<must>>
+  usecase "US09 · Consulter historique\nDoD: liste triee date, cours, score" <<must>>
+  usecase "US10 · Pages legales RGPD\nDoD: CGU + politique + mentions OK" <<must>>
+}
+
+package "SHOULD HAVE — Release 2 (v1.1.0)" {
+  usecase "US20 · Mode enseignant\nDoD: profil teacher, quiz exportable PDF" <<should>>
+  usecase "US21 · Dashboard progression\nDoD: graphique evolution scores" <<should>>
+  usecase "US22 · Revision ciblee erreurs\nDoD: flashcard questions ratees" <<should>>
+  usecase "US23 · Export SAR RGPD\nDoD: GET /api/me/export JSON" <<should>>
+  usecase "US24 · Generation HQ differee\nDoD: llama3.1 mode asynchrone" <<should>>
+}
+
+package "MUST HAVE — Release 3 · [a11y] RGAA" {
+  usecase "US25 · Audit RGAA + rapport\nDoD: 0 critere bloquant niveau 1" <<must>>
+  usecase "US26 · Contrastes + focus visible\nDoD: ratio >= 4.5:1, outline visible" <<must>>
+  usecase "US27 · Navigation clavier complete\nDoD: Tab/Entree/Echap, 0 piege focus" <<must>>
+}
+
+package "MUST HAVE — Release 3 · [i18n] Internationalisation" {
+  usecase "US28 · Externalisation textes UI\nDoD: i18next, fichiers fr/en/es" <<must>>
+  usecase "US29 · Param langue -> LLM\nDoD: lang dans system prompt Ollama" <<should>>
+  usecase "US-i18n · Detection langue navigateur\nDoD: Accept-Language -> i18next" <<must>>
+}
+
+package "MUST HAVE — Release 3 · [scale] Scalabilite" {
+  usecase "US30 · Tests de charge k6\nDoD: p95 < 15s a 10k utilisateurs" <<must>>
+  usecase "US31 · Cache Redis LLM\nDoD: hit < 100ms, TTL 24h" <<must>>
+  usecase "US32 · LLM de secours\nDoD: fallback auto si Ollama KO" <<could>>
+  usecase "US33 · Monitoring Prometheus\nDoD: alertes + dashboard Grafana" <<should>>
+}
+
+package "WON'T HAVE — Hors scope" {
+  usecase "Application mobile iOS/Android" <<wont>>
+  usecase "Integration Moodle / LMS" <<wont>>
+  usecase "Conformite WCAG 2.2 AAA" <<wont>>
+  usecase "Collaboration multi-profs temps reel" <<wont>>
+}
+
+@enduml

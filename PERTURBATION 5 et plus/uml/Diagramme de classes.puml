@@ -1,0 +1,111 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+title Modele de classes — EduTutor IA v2.0 (+ i18n · a11y · cache)
+
+class User {
+  +id : UUID
+  +email : String
+  +password_hash : String
+  +is_verified : Boolean
+  +date_joined : DateTime
+  +role : Enum[student, teacher, admin]
+  +preferred_language : Enum[fr, en, es]
+  +accessibility_mode : Boolean
+}
+
+class UserPreference {
+  +id : UUID
+  +language : Enum[fr, en, es]
+  +high_contrast : Boolean
+  +keyboard_nav_only : Boolean
+  +updated_at : DateTime
+}
+
+class Cours {
+  +id : UUID
+  +title : String
+  +source_type : Enum[pdf, text]
+  +source_text : TextField
+  +file_path : String
+  +detected_language : Enum[fr, en, es, auto]
+  +created_at : DateTime
+}
+
+class Quiz {
+  +id : UUID
+  +score : Integer
+  +language : Enum[fr, en, es]
+  +completed_at : DateTime
+  +created_at : DateTime
+  +from_cache : Boolean
+  +cache_key : String
+}
+
+class Question {
+  +id : UUID
+  +enonce : TextField
+  +choice_a : String
+  +choice_b : String
+  +choice_c : String
+  +choice_d : String
+  +correct_answer : Enum[A,B,C,D]
+  +order : Integer
+  +language : Enum[fr, en, es]
+}
+
+class UserAnswer {
+  +id : UUID
+  +answer_given : Enum[A,B,C,D]
+  +is_correct : Boolean
+  +answered_at : DateTime
+}
+
+class CacheEntry {
+  +cache_key : String
+  +content_hash : String
+  +language : Enum[fr, en, es]
+  +questions_json : TextField
+  +created_at : DateTime
+  +expires_at : DateTime
+  +hit_count : Integer
+}
+
+class LLMRequest {
+  +id : UUID
+  +model_used : String
+  +is_fallback : Boolean
+  +latency_ms : Integer
+  +lang : Enum[fr, en, es]
+  +injection_detected : Boolean
+  +created_at : DateTime
+}
+
+User "1" --> "1" UserPreference : possede
+User "1" --> "0..*" Cours : cree
+User "1" --> "0..*" Quiz : passe
+Cours "1" --> "0..*" Quiz : genere
+Quiz "1" --> "10" Question : contient
+Question "1" --> "0..1" UserAnswer : recoit
+User "1" --> "0..*" UserAnswer : soumet
+Quiz "0..*" --> "0..1" CacheEntry : servi depuis
+Quiz "1" --> "0..1" LLMRequest : declenche
+
+note top of UserPreference
+  [a11y] Preferences accessibilite stockees
+  par utilisateur (persistees en DB)
+end note
+
+note right of CacheEntry
+  [scale] Cache Redis (TTL 24h)
+  Cle = hash(source_text + lang)
+  Hit = quiz servi en < 100ms
+end note
+
+note bottom of LLMRequest
+  Audit & monitoring
+  fallback si Ollama indisponible
+  injection_detected -> alert
+end note
+
+@enduml

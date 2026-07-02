@@ -1,0 +1,56 @@
+@startuml
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam rectangle {
+  BackgroundColor<<r1>> #D4EDDA
+  BorderColor<<r1>> #28A745
+  BackgroundColor<<r2>> #FFF3CD
+  BorderColor<<r2>> #FFC107
+  BackgroundColor<<r3>> #D1ECF1
+  BorderColor<<r3>> #17A2B8
+  BackgroundColor<<title>> #1A56AA
+  FontColor<<title>> white
+  BorderColor<<title>> #1A56AA
+  BackgroundColor<<a11y>> #F3E5F5
+  BorderColor<<a11y>> #8E24AA
+  BackgroundColor<<i18n>> #E3F2FD
+  BorderColor<<i18n>> #1565C0
+  BackgroundColor<<scale>> #FFF8E1
+  BorderColor<<scale>> #F57F17
+}
+
+title Release Planning — EduTutor IA v2.0
+
+rectangle "RELEASE 1 — MVP  |  v1.0.0-mvp  |  Mercredi 01/07 17h45 LIVREE" <<title>>
+
+rectangle "F1 · Auth email\n(inscription · validation · reset)" <<r1>> as F1
+rectangle "F2 · Upload cours\n(PDF <= 5Mo ou texte >= 200c)" <<r1>> as F2
+rectangle "F3 · Generation quiz\n(10 QCM · llama3.2 · RAG)" <<r1>> as F3
+rectangle "F4 · Soumission quiz\n(correction auto cote serveur)" <<r1>> as F4
+rectangle "F5 · Score + detail\n(/10 + bonnes / mauvaises)" <<r1>> as F5
+rectangle "F6 · Historique\n(date + cours + score)" <<r1>> as F6
+rectangle "Pages legales RGPD\n(CGU · confidentialite · mentions)" <<r1>> as LEGAL
+rectangle "Securite base\n(JWT · validation inputs · LLM-01)" <<r1>> as SEC1
+
+rectangle "RELEASE 2  |  v1.1.0  |  Jeudi 02/07 17h45" <<title>>
+
+rectangle "Mode enseignant\n(Mme Lefevre · export PDF)" <<r2>> as TEACH
+rectangle "SAR RGPD\n(GET /api/me/export)" <<r2>> as SAR
+rectangle "Dashboard progression\n(graphiques scores)" <<r2>> as DASH
+rectangle "Revision ciblee erreurs\n(flashcard questions ratees)" <<r2>> as REV
+rectangle "Generation HQ differee\n(llama3.1 asynchrone)" <<r2>> as HQ
+
+rectangle "RELEASE 3  |  v2.0.0  |  Sprint S3-S5  |  Perturbation J4" <<title>>
+
+rectangle "[a11y] Audit RGAA\n+ rapport criteres bloq." <<a11y>> as RGAA
+rectangle "[a11y] Contrastes + focus\n(ratio >= 4.5:1)" <<a11y>> as A11Y2
+rectangle "[a11y] Navigation clavier\n(Tab · Entree · Echap)" <<a11y>> as A11Y3
+rectangle "[i18n] i18next\n(fr / en / es · fichiers trad.)" <<i18n>> as I18N1
+rectangle "[i18n] Langue -> LLM\n(param lang systeme prompt)" <<i18n>> as I18N2
+rectangle "[i18n] Detection auto\n(Accept-Language)" <<i18n>> as I18N3
+rectangle "[scale] Cache Redis\n(TTL 24h · < 100ms)" <<scale>> as REDIS
+rectangle "[scale] Tests de charge\n(k6 · 10k users · p95 < 15s)" <<scale>> as CHARGE
+rectangle "[scale] Monitoring\n(Prometheus · Grafana)" <<scale>> as MONIT
+rectangle "[scale] LLM fallback\n(OpenAI / Claude si Ollama KO)" <<scale>> as FALLB
+
+@enduml

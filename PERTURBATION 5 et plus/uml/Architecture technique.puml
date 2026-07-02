@@ -1,0 +1,73 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam backgroundColor #FFFFFF
+title Architecture technique — EduTutor IA v2.0 (Scale · RGAA · i18n)
+
+package "Client Browser" {
+  [React + Vite :3000\n+ i18next (fr/en/es)\n+ axe-core RGAA] as FRONT
+}
+
+package "Docker Compose — Serveur (v2)" {
+
+  package "Reverse Proxy" {
+    [Nginx :80 / :443\n(rate limiting · gzip)] as NGINX
+  }
+
+  package "Backend" {
+    [Django REST Framework :8000\n(Gunicorn)] as API
+    [PostgreSQL 15 :5432] as DB
+  }
+
+  package "Cache Layer [scale]" {
+    [Redis :6379\nCache LLM (TTL 24h)\nSession store] as REDIS
+  }
+
+  package "IA Layer" {
+    [Ollama :11434\nllama3.2 (primaire)\nllama3.1:8b (HQ)] as OLLAMA
+    [RAG Service\n(PyPDF2 · chunking\n· prompt builder\n· sanitize injection LLM-01)] as RAG
+    [LLM Fallback\n(OpenAI / Claude Haiku)\nsi Ollama indisponible] as FALLBACK
+  }
+
+  package "Observabilite [scale]" {
+    [Prometheus :9090\n(metriques HTTP / LLM)] as PROM
+    [Grafana :3001\n(dashboards)] as GRAFANA
+  }
+}
+
+FRONT --> NGINX : HTTPS
+NGINX --> FRONT : / (static build)
+NGINX --> API : /api/*
+API --> DB : ORM Django (TCP 5432)
+API --> REDIS : cache_get / cache_set
+API --> RAG : texte source + lang
+RAG --> OLLAMA : POST /api/chat\n{model, messages[system+user], lang}
+OLLAMA --> RAG : stream JSON 10 QCM
+RAG --> FALLBACK : si timeout / erreur Ollama
+FALLBACK --> RAG : 10 QCM (fallback)
+RAG --> API : questions[] validees (Pydantic)
+API --> PROM : metriques (counter, histogram)
+GRAFANA --> PROM : scrape /metrics
+
+note right of REDIS
+  Cache LLM identiques -> < 100ms
+  TTL = 24h (configurable)
+  Desactivable via env: CACHE_LLM=false
+end note
+
+note right of OLLAMA
+  Modele local uniquement (par defaut)
+  Aucune donnee externalisee
+  Conformite RGPD garantie
+  Fallback cloud configure via env
+end note
+
+note top of FRONT
+  [a11y] Navigation clavier (Tab/Entree/Echap)
+  [a11y] Contrastes >= 4.5:1 (RGAA 3.2)
+  [a11y] Labels ARIA sur tous les elements
+  [i18n] i18next : fr / en / es
+  [i18n] Detection langue navigateur auto
+end note
+
+@enduml
